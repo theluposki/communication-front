@@ -42,6 +42,9 @@ async function startCamera() {
         aspectRatio: 9 / 16,
         videoCodec: "h264",
         facingMode: currentCamera,
+        focusMode: 'manual', // Modo de foco manual
+        focusDistance: 1,  // Distância de foco desejada (em metros)
+        frameRate: { ideal: 30, max: 60 }
       },
     };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -57,7 +60,12 @@ async function startCamera() {
     });
 
     function drawFrame() {
-      ctx.value.clearRect(0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
+      ctx.value.clearRect(
+        0,
+        0,
+        cameraCanvas.value.width,
+        cameraCanvas.value.height
+      );
 
       if (currentCamera === "user") {
         ctx.value.save();
@@ -67,7 +75,13 @@ async function startCamera() {
         ctx.value.translate(-cameraCanvas.value.width, 0);
       }
 
-      ctx.value.drawImage(video, 0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
+      ctx.value.drawImage(
+        video,
+        0,
+        0,
+        cameraCanvas.value.width,
+        cameraCanvas.value.height
+      );
 
       if (currentCamera === "user") {
         ctx.value.restore();
@@ -85,32 +99,18 @@ async function startCamera() {
   }
 }
 
-function focusImage(event) {
-  // Get the coordinates of the click
-  const x = event.clientX;
-  const y = event.clientY;
-
-  console.log(`x: ${x}, y: ${y}`);
-
-  ctx.value.fillStyle = "red";
-  ctx.value.fillRect(x, y, 100, 100);
-
-  // Set the focus point to the click coordinates
-  ctx.value.drawImage(video, x, y, cameraCanvas.value.width, cameraCanvas.value.height);
-}
-
 async function takePhoto() {
-  // Certifique-se de que o vídeo já tenha sido carregado corretamente antes de tirar a foto.
   if (!video.paused && !video.ended) {
-    // Pausar o vídeo temporariamente para evitar que a imagem mude enquanto desenhamos a foto no canvas.
     video.pause();
 
-    // Desenhar a imagem do vídeo no canvas.
-    ctx.value.drawImage(video, 0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
+    ctx.value.drawImage(
+      video,
+      0,
+      0,
+      cameraCanvas.value.width,
+      cameraCanvas.value.height
+    );
 
-    // Continuar o vídeo após a captura da foto.
-
-    // Obtenha a imagem do canvas como um data URL.
     const dataURL = cameraCanvas.value.toDataURL();
 
     imgBase64.value = dataURL;
