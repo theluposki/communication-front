@@ -57,6 +57,11 @@ footer {
   border-radius: 6px;
   cursor: pointer;
   border: solid 2px transparent;
+  color: var(--current-primary);
+}
+
+.nav-link i {
+  filter: drop-shadow(2px -1px 0px var(--dark2));
 }
 
 .nav-link:hover {
@@ -70,7 +75,11 @@ footer {
 
 .active {
     background-color: var(--current-primary);
-    color: var(--dark);
+    color: var(--white);
+}
+
+.active i {
+  filter: drop-shadow(4px 4px 2px var(--dark));
 }
 
 .active:hover {
