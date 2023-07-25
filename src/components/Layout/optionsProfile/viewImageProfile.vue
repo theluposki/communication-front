@@ -1,8 +1,13 @@
 <script setup>
-import { onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useActionImageProfileLayoutStore } from "../../../stores/actionImageProfileLayout.js";
 
 const ActionImageProfileLayoutStore = useActionImageProfileLayoutStore();
+
+const panelConfirmOrTrash = ref(false);
+const btnPhoto = ref(true);
+
+const imgBase64 = ref("");
 
 onMounted(() => {
   startCamera();
@@ -15,6 +20,7 @@ onUnmounted(() => {
 
 let videoTrack;
 let currentCamera = "user";
+let video;
 
 function stopCamera() {
   if (videoTrack) {
@@ -30,14 +36,14 @@ async function startCamera() {
       video: {
         width: 1920,
         height: 1080,
-        aspectRatio: 9/16,
+        aspectRatio: 9 / 16,
         videoCodec: "h264",
         facingMode: currentCamera,
       },
     };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     videoTrack = stream.getVideoTracks()[0];
-    const video = document.createElement("video");
+    video = document.createElement("video");
 
     video.srcObject = new MediaStream([videoTrack]);
     video.autoplay = true;
@@ -64,12 +70,7 @@ async function startCamera() {
         ctx.restore();
       }
 
-      // Aplique um filtro de brilho.
       ctx.filter = "brightness(1.2)";
-
-      // Aplique um filtro de contraste.
-      ctx.filter = "contrast(1.1)";
-
       requestAnimationFrame(drawFrame);
     }
 
@@ -79,6 +80,44 @@ async function startCamera() {
   } catch (error) {
     console.error("Erro ao acessar a câmera:", error);
   }
+}
+
+async function takePhoto() {
+  const cameraCanvas = document.getElementById("cameraCanvas");
+  const ctx = cameraCanvas.getContext("2d");
+
+  // Certifique-se de que o vídeo já tenha sido carregado corretamente antes de tirar a foto.
+  if (!video.paused && !video.ended) {
+    // Pausar o vídeo temporariamente para evitar que a imagem mude enquanto desenhamos a foto no canvas.
+    video.pause();
+
+    // Desenhar a imagem do vídeo no canvas.
+    ctx.drawImage(video, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+    // Continuar o vídeo após a captura da foto.
+
+    // Obtenha a imagem do canvas como um data URL.
+    const dataURL = cameraCanvas.toDataURL();
+
+    imgBase64.value = dataURL;
+
+    panelConfirmOrTrash.value = true;
+    btnPhoto.value = false;
+  }
+}
+
+function confirmPhoto() {
+  console.log(imgBase64.value);
+  video.play();
+  panelConfirmOrTrash.value = false;
+  btnPhoto.value = true;
+}
+
+function trashPhoto() {
+  video.play();
+  panelConfirmOrTrash.value = false;
+  btnPhoto.value = true;
+  imgBase64.value = "";
 }
 
 async function switchCamera() {
@@ -99,7 +138,7 @@ async function switchCamera() {
       <i class="bx bx-x"></i>
     </button>
 
-    <button class="btn btn-photo">
+    <button class="btn btn-photo" v-if="btnPhoto" @click="takePhoto">
       <i class="bx bx-camera"></i>
     </button>
 
@@ -108,16 +147,16 @@ async function switchCamera() {
     </button>
 
     <button class="btn btn-rotate" @click="switchCamera">
-        <i class='bx bx-transfer-alt'></i>
+      <i class="bx bx-transfer-alt"></i>
     </button>
 
-    <div class="confirmOrTrash">        
-        <button class="btn btn-check">
-            <i class='bx bx-check'></i>
-        </button>
-        <button class="btn btn-trash">
-            <i class='bx bx-trash-alt' ></i>
-        </button>
+    <div class="confirmOrTrash" v-if="panelConfirmOrTrash">
+      <button class="btn btn-check" @click="confirmPhoto">
+        <i class="bx bx-check"></i>
+      </button>
+      <button class="btn btn-trash" @click="trashPhoto">
+        <i class="bx bx-trash-alt"></i>
+      </button>
     </div>
   </div>
 </template>
@@ -163,6 +202,7 @@ async function switchCamera() {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(26, 26, 26, 0.5);
+  z-index: 1;
 }
 
 .confirmOrTrash {
@@ -170,13 +210,14 @@ async function switchCamera() {
   bottom: 24px;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(26, 26, 26, 0.5);
+  background-color: transparent;
 
   display: flex;
   gap: 60px;
 }
 
-.btn-check, .btn-trash {
+.btn-check,
+.btn-trash {
   background-color: rgba(26, 26, 26, 0.5);
 }
 
