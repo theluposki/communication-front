@@ -9,9 +9,6 @@ const userStore = useUserStore();
 const ActionImageProfileLayoutStore = useActionImageProfileLayoutStore();
 
 const user = computed(() => userStore.user);
-const activeOptions = computed(
-  () => ActionImageProfileLayoutStore.activeOptions
-);
 
 const setColor = (color) => {
   const favoriteColor = {
@@ -52,13 +49,13 @@ const setColor = (color) => {
         <i class='bx bxs-user-circle' ></i>
         Perfil
     </div>
-    <div class="opt">
+    <div class="opt" @click="ActionImageProfileLayoutStore.fnViewImageToggle">
         <i class='bx bx-image-alt'></i>
         Ver Foto
     </div>
     <div class="opt" @click="toggleFullscreen">
         <i class='bx bx-fullscreen'></i>
-        Tela cheia
+        Tela cheia<code>F11</code>
     </div>
     <div class="opt">
         <i class='bx bx-log-out'></i>

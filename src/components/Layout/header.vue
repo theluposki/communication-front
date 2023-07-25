@@ -2,17 +2,30 @@
 import { ref, computed } from "vue";
 import { useUserStore } from "../../stores/user.js";
 import actionImageProfile from "./optionsProfile/actionImageProfile.vue"
+import viewImageProfile from "./optionsProfile/viewImageProfile.vue";
+import { useActionImageProfileLayoutStore } from "../../stores/actionImageProfileLayout.js";
 
 const userStore = useUserStore();
+const ActionImageProfileLayoutStore = useActionImageProfileLayoutStore();
 
 const user = computed(() => userStore.user);
-
+const activeViewImage = computed(
+  () => ActionImageProfileLayoutStore.activeViewImage
+);
 </script>
 
 <template>
   <header>
     <div class="back">beck</div>
     <actionImageProfile v-if="user.picture" />
+
+    <transition
+      enter-active-class="animate__animated animate__fadeIn"
+      leave-active-class="animate__animated animate__fadeOut"
+      mode="out-in"
+    >
+      <viewImageProfile v-if="activeViewImage" />
+    </transition>
   </header>
 </template>
 

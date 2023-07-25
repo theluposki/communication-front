@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useUserStore } from "../../../stores/user.js";
 import { useActionImageProfileLayoutStore } from "../../../stores/actionImageProfileLayout.js";
+
 import panelOptions from "./panelOptions.vue";
 
 const userStore = useUserStore();
@@ -11,6 +12,7 @@ const user = computed(() => userStore.user);
 const activeOptions = computed(
   () => ActionImageProfileLayoutStore.activeOptions
 );
+
 </script>
 
 <template>
