@@ -9,7 +9,12 @@ const btnPhoto = ref(true);
 
 const imgBase64 = ref("");
 
+const cameraCanvas = ref(null);
+const ctx = ref(null);
+
 onMounted(() => {
+  cameraCanvas.value = document.getElementById("cameraCanvas");
+  ctx.value = cameraCanvas.value.getContext("2d");
   startCamera();
 });
 
@@ -29,8 +34,6 @@ function stopCamera() {
 }
 
 async function startCamera() {
-  const cameraCanvas = document.getElementById("cameraCanvas");
-  const ctx = cameraCanvas.getContext("2d");
   try {
     const constraints = {
       video: {
@@ -49,28 +52,28 @@ async function startCamera() {
     video.autoplay = true;
 
     video.addEventListener("loadedmetadata", () => {
-      cameraCanvas.width = video.videoWidth;
-      cameraCanvas.height = video.videoHeight;
+      cameraCanvas.value.width = video.videoWidth;
+      cameraCanvas.value.height = video.videoHeight;
     });
 
     function drawFrame() {
-      ctx.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+      ctx.value.clearRect(0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
 
       if (currentCamera === "user") {
-        ctx.save();
-        ctx.scale(-1, 1); // Inverte horizontalmente
-        ctx.imageSmoothingEnabled = false;
-        ctx.imageSmoothingQuality = "high";
-        ctx.translate(-cameraCanvas.width, 0);
+        ctx.value.save();
+        ctx.value.scale(-1, 1); // Inverte horizontalmente
+        ctx.value.imageSmoothingEnabled = false;
+        ctx.value.imageSmoothingQuality = "high";
+        ctx.value.translate(-cameraCanvas.value.width, 0);
       }
 
-      ctx.drawImage(video, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      ctx.value.drawImage(video, 0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
 
       if (currentCamera === "user") {
-        ctx.restore();
+        ctx.value.restore();
       }
 
-      ctx.filter = "brightness(1.2)";
+      ctx.value.filter = "brightness(1.2)";
       requestAnimationFrame(drawFrame);
     }
 
@@ -82,22 +85,33 @@ async function startCamera() {
   }
 }
 
-async function takePhoto() {
-  const cameraCanvas = document.getElementById("cameraCanvas");
-  const ctx = cameraCanvas.getContext("2d");
+function focusImage(event) {
+  // Get the coordinates of the click
+  const x = event.clientX;
+  const y = event.clientY;
 
+  console.log(`x: ${x}, y: ${y}`);
+
+  ctx.value.fillStyle = "red";
+  ctx.value.fillRect(x, y, 100, 100);
+
+  // Set the focus point to the click coordinates
+  ctx.value.drawImage(video, x, y, cameraCanvas.value.width, cameraCanvas.value.height);
+}
+
+async function takePhoto() {
   // Certifique-se de que o vídeo já tenha sido carregado corretamente antes de tirar a foto.
   if (!video.paused && !video.ended) {
     // Pausar o vídeo temporariamente para evitar que a imagem mude enquanto desenhamos a foto no canvas.
     video.pause();
 
     // Desenhar a imagem do vídeo no canvas.
-    ctx.drawImage(video, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    ctx.value.drawImage(video, 0, 0, cameraCanvas.value.width, cameraCanvas.value.height);
 
     // Continuar o vídeo após a captura da foto.
 
     // Obtenha a imagem do canvas como um data URL.
-    const dataURL = cameraCanvas.toDataURL();
+    const dataURL = cameraCanvas.value.toDataURL();
 
     imgBase64.value = dataURL;
 
@@ -129,7 +143,7 @@ async function switchCamera() {
 
 <template>
   <div class="viewImageProfile">
-    <canvas id="cameraCanvas"></canvas>
+    <canvas id="cameraCanvas" @click.stop="focusImage"></canvas>
 
     <button
       class="btn btn-close"
