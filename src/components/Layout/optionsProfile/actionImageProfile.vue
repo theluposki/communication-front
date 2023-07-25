@@ -19,11 +19,19 @@ const activeOptions = computed(
       class="imageProfile"
       @click="ActionImageProfileLayoutStore.fnOptionsToggle"
     >
-      <img
+      <!-- <img
         v-if="user.picture"
         :src="`https://localhost:3004${user.picture.imageSmall}`"
         alt="image user"
+      /> -->
+
+      <img
+        v-if="user.picture"
+        src="https://i.pravatar.cc/150?img=32"
+        alt="image user"
       />
+
+      
     </div>
 
     <transition
