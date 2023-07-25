@@ -1,35 +1,26 @@
 <script setup>
-import { ref } from 'vue'
-import { socket } from '../socket.io.js';
-
-const connect = () => {
-  socket.emit("user_connected", { user: "Luposki " })
-}
-
-const disconnect = () => {
-  socket.emit("user_disconnected", { user: "Luposki " })
-}
+import { onMounted } from "vue"
+import HeaderM from "./components/Layout/header.vue"
+import MainM from "./components/Layout/main.vue"
+import FooterM from "./components/Layout/footer.vue"
+import { decryptValue } from "./utils/crypto.js"
+onMounted(() => {
+  
+  if(localStorage.getItem('favoriteColor')) {
+    const favoriteColor = JSON.parse(decryptValue(localStorage.getItem('favoriteColor')))
+    document.documentElement.style.setProperty('--current-secondary', favoriteColor.currentSecondary);
+    document.documentElement.style.setProperty('--current-primary', favoriteColor.currentPrimary);
+  }
+})
 
 </script>
 
 <template>
-  <h1>APP</h1>
-  {{ PORT }}
-  <button @click="connect">Conectar</button>
-  <button @click="disconnect">Desconectar</button>
-</template>
+  <HeaderM />
+  <MainM />
+  <FooterM />
+</template> 
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
 </style>
