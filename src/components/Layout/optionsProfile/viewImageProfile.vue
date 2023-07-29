@@ -42,8 +42,6 @@ async function startCamera() {
         aspectRatio: 9 / 16,
         videoCodec: "h264",
         facingMode: currentCamera,
-        focusMode: 'manual', // Modo de foco manual
-        focusDistance: 1,  // Distância de foco desejada (em metros)
         frameRate: { ideal: 30, max: 60 }
       },
     };
