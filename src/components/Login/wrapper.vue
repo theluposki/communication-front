@@ -1,13 +1,30 @@
+<script setup>
+import { ref } from "vue"
+import Login from "./login.vue"
+import Logup from "./logup.vue"
+
+const activeLogin = ref(true)
+
+const fnActiveLogin = () => {
+  activeLogin.value = !activeLogin.value
+}
+
+</script>
 <template>
     <div class="wrapper">
         <div class="nav">
-            <div class="activeLogin">
-                Login
+            <div :class="activeLogin ? 'activeLogin active' : 'activeLogin' " @click="fnActiveLogin">
+                Acessar
+                <i class='bx bx-log-in'></i>
             </div>
-            <div class="activeLogup">
-                Logup
+            <div :class="!activeLogin ? 'activeLogin active' : 'activeLogin' " @click="fnActiveLogin">
+                Crie sua conta
+                <i class='bx bxs-invader' ></i>
             </div>
         </div>
+        
+        <Login v-if="activeLogin"/>
+        <Logup v-else/>
     </div>
 </template>
 
@@ -21,6 +38,9 @@
 }
 
 .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -32,9 +52,39 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 4px;
+    max-width: 50%;
     flex-grow: 1;
     background-color: transparent;
     font-weight: 600;
     cursor: pointer;
 }
+
+.activeLogin i, .activeLogup i {
+  filter: drop-shadow(2px -1px 0px var(--dark2));
+}
+
+.activeLogin:hover, .activeLogup:hover {
+  transition: all ease 0.4s;
+  box-shadow: inset 0 0 3px var(--current-primary);
+}
+
+.activeLogin:active, .activeLogup:active {
+  scale: 0.96;
+}
+
+.active {
+    background-color: var(--current-primary);
+    color: var(--white);
+}
+
+.active i {
+  filter: drop-shadow(4px 4px 2px var(--dark));
+}
+
+.active:hover {
+  transition: all ease 0.4s;
+  box-shadow: inset 0 0 6px var(--dark2);
+}
+
 </style>
