@@ -1,26 +1,38 @@
 <script setup>
-import { onMounted } from "vue"
-import HeaderM from "./components/Layout/header.vue"
-import MainM from "./components/Layout/main.vue"
-import FooterM from "./components/Layout/footer.vue"
-import { decryptValue } from "./utils/crypto.js"
-onMounted(() => {
-  
-  if(localStorage.getItem('favoriteColor')) {
-    const favoriteColor = JSON.parse(decryptValue(localStorage.getItem('favoriteColor')))
-    document.documentElement.style.setProperty('--current-secondary', favoriteColor.currentSecondary);
-    document.documentElement.style.setProperty('--current-primary', favoriteColor.currentPrimary);
-  }
-})
+import { onMounted, computed } from "vue";
+import HeaderM from "./components/Layout/header.vue";
+import MainM from "./components/Layout/main.vue";
+import FooterM from "./components/Layout/footer.vue";
+import Wrapper from "./components/Login/wrapper.vue"
+import { decryptValue } from "./utils/crypto.js";
 
+import { useUserStore } from "./stores/user.js";
+
+const userStore = useUserStore();
+
+const user = computed(() => userStore.user);
+
+onMounted(() => {
+  if (localStorage.getItem("favoriteColor")) {
+    const favoriteColor = JSON.parse(
+      decryptValue(localStorage.getItem("favoriteColor"))
+    );
+    document.documentElement.style.setProperty(
+      "--current-secondary",
+      favoriteColor.currentSecondary
+    );
+    document.documentElement.style.setProperty(
+      "--current-primary",
+      favoriteColor.currentPrimary
+    );
+  }
+});
 </script>
 
 <template>
-  <HeaderM />
-  <MainM />
-  <FooterM />
-</template> 
+  <Wrapper v-if="!user.id"/>
+  <HeaderM v-if="user.id"/>
+  <MainM  v-if="user.id"/>
+  <FooterM v-if="user.id"/>
+</template>
 
-<style scoped>
-
-</style>

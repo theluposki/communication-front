@@ -9,9 +9,7 @@ const myuser = {
   age: 18,
   gender: "Woman",
   bio: "write your biography 💻 ",
-  picture: {
-    imageSmall: "/defaults/userWoman.jpg",
-  },
+  picture: ["/defaults/userWoman.jpg"],
   links: [
     {
       name: "🔗 mylink",
@@ -22,7 +20,7 @@ const myuser = {
 };
 
 export const useUserStore = defineStore("user", () => {
-  const user = ref(myuser);
+  const user = ref({});
 
   const login = async () => {
     user.value = myuser
