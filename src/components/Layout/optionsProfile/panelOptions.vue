@@ -57,7 +57,7 @@ const setColor = (color) => {
         <i class='bx bx-fullscreen'></i>
         Tela cheia<code>F11</code>
     </div>
-    <div class="opt">
+    <div class="opt" @click="userStore.logout">
         <i class='bx bx-log-out'></i>
         Sair
     </div>

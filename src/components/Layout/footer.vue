@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 
 const { push, currentRoute } = useRouter();
@@ -8,7 +8,6 @@ const pathname = computed(() => currentRoute.value.fullPath);
 
 const setLink = (link) => {
   push(link);
-  storeLayout.fnActiveMenu();
 };
 </script>
 

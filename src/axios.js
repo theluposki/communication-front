@@ -1,12 +1,12 @@
-import { create } from "axios";
+import axios from "axios";
 
-export const api = create({
+export const api = axios.create({
   baseURL: "https://localhost:3004/v1",
   mode: "cors",
   cache: "no-cache",
-  credentials: "include",
+  withCredentials: true,
+  referrerPolicy: "origin",
   headers: {
     "Content-Type": "application/json",
   },
-  referrerPolicy: "origin",
 });

@@ -1,38 +1,50 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { socket } from "../socket.io.js";
+import { api } from "../axios.js"
 
-const myuser = {
-  id: "96b5d0d9-ea59-4cc4-ae06-2949a0934e1e",
-  fullName: "Nick Doe",
-  nickname: "nickdoe",
-  age: 18,
-  gender: "Woman",
-  bio: "write your biography 💻 ",
-  picture: ["/defaults/userWoman.jpg"],
-  links: [
-    {
-      name: "🔗 mylink",
-      href: "http://link.com",
-    },
-  ],
-  createdAt: "2023-07-20T01:17:52.000Z",
-};
+import { encryptValue } from "../utils/crypto.js"
 
 export const useUserStore = defineStore("user", () => {
   const user = ref({});
 
-  const login = async () => {
-    user.value = myuser
+  const connect = (nickname) => {
+    socket.emit("user_connected", { user: nickname });
   };
 
-  const connect = () => {
-    socket.emit("user_connected", { user: "Luposki " });
+  const disconnect = (nickname) => {
+    socket.emit("user_disconnected", { user: nickname });
   };
 
-  const disconnect = () => {
-    socket.emit("user_disconnected", { user: "Luposki " });
+  const login = async (email, password) => {
+    const response = await api.post("/users/auth", {
+      email,
+      password,
+    });
+
+    if (response.data.token) {
+      const profile = await api.get("/profiles/my");
+
+      user.value = profile.data;
+      localStorage.setItem("profile", encryptValue(JSON.stringify(profile.data)))
+      connect(profile.data.nickname)
+    }
   };
 
-  return { user };
+  const refreshUser = async () => {
+    const profile = await api.get("/profiles/my");
+
+    user.value = profile.data;
+    localStorage.setItem("profile", encryptValue(JSON.stringify(profile.data)))
+  }
+
+  const logout = () => {
+    localStorage.removeItem("profile")
+    disconnect(user.value.nickname)
+    user.value = {}
+  }
+
+
+
+  return { user, login, logout, refreshUser };
 });

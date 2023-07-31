@@ -21,17 +21,17 @@ const activeOptions = computed(
       class="imageProfile"
       @click="ActionImageProfileLayoutStore.fnOptionsToggle"
     >
-      <!-- <img
-        v-if="user.picture"
-        :src="`https://localhost:3004${user.picture.imageSmall}`"
-        alt="image user"
-      /> -->
-
       <img
+        v-if="user.picture"
+        :src="`https://localhost:3004${user.picture[0]}`"
+        alt="image user"
+      />
+
+      <!-- <img
         v-if="user.picture"
         src="https://i.pravatar.cc/150?img=32"
         alt="image user"
-      />
+      /> -->
 
       
     </div>
@@ -135,7 +135,7 @@ const activeOptions = computed(
   width: 50px;
   height: 50px;
   object-fit: cover;
-  border-radius: 50px;
+  border-radius: 50%;
   z-index: 1;
   border: solid 2px var(--dark2);
   filter: grayscale(0.2);

@@ -1,21 +1,64 @@
 <script setup>
-import { ref } from "vue"
+import { ref } from "vue";
+import { useUserStore } from "../../stores/user.js"
 
-const email = ref("")
-const password = ref("")
+const userStore = useUserStore()
 
-const fnLogin = () => {
-  const elEmail = document.querySelector('.email');
-  const elPassword = document.querySelector('.password');
- 
-  if(email.value == '' || password.value == '') {
-    elEmail.classList.add('shake', 'error')
-    elPassword.classList.add('shake', 'error')
+const email = ref("nickdoe@gmail.com");
+const password = ref("Monkeydluffy1234@");
+let interval;
+
+const validEmail = () => {
+  const elEmail = document.querySelector(".email");
+  const pattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+  clearInterval(interval);
+
+  interval = setTimeout(() => {
+    if (!RegExp(pattern).exec(email.value)) {
+      elEmail.classList.add("error");
+      const errorTxt = elEmail.querySelector(".error-text");
+      if (email.value != "") {
+        errorTxt.innerText = "Enter a valid e-mail address";
+      } else {
+        console.log("sdadaas");
+        errorTxt.innerText = "E-mail can'r be blank";
+      }
+    } else {
+      elEmail.classList.remove("error");
+    }
+  }, 500);
+};
+
+const validPassword = () => {
+  const elPassword = document.querySelector(".password");
+
+  if (password.value == "") {
+    elPassword.classList.add("error");
+    const errorTxt = elPassword.querySelector(".error-text");
+    if (password.value === "") {
+      errorTxt.innerText = "Password can'r be blank";
+    }
   } else {
-    elEmail.classList.remove('shake')
-    elPassword.classList.remove('shake')
+    elPassword.classList.remove("error");
   }
-}
+};
+
+const fnLogin = async () => {
+  const elEmail = document.querySelector(".email");
+  const elPassword = document.querySelector(".password");
+  if (email.value == "" || password.value == "") {
+    elEmail.classList.add("shake", "error");
+    elPassword.classList.add("shake", "error");
+  }
+
+  setTimeout(() => {
+    elEmail.classList.remove("shake");
+    elPassword.classList.remove("shake");
+  }, 500);
+
+  await userStore.login(email.value, password.value)
+};
 </script>
 
 <template>
@@ -24,28 +67,43 @@ const fnLogin = () => {
       <h2 class="title">MyReb</h2>
       <div class="field email">
         <div class="input-area">
-          <input type="email" v-model="email" id="email" placeholder="digite seu e-mail" />
-          <i class='icon bx bxs-envelope' ></i>
-          <i class='error icon-erro bx bx-error-circle' ></i>
+          <input
+            tabindex="1"
+            type="email"
+            @keyup="validEmail"
+            v-model="email"
+            id="email"
+            placeholder="digite seu e-mail"
+          />
+          <i class="icon bx bxs-envelope"></i>
+          <i class="error icon-erro bx bx-error-circle"></i>
         </div>
-        <div class="error error-text">E-mail inválido</div>
+        <div class="error error-text"></div>
       </div>
-   
+
       <div class="field password">
         <div class="input-area">
-          <input type="password" v-model="password" id="password" placeholder="digite sua senha" />
-          <i class='icon bx bxs-lock' ></i>
-          <i class='error icon-erro bx bx-error-circle' ></i>
+          <input
+            tabindex="2"
+            type="password"
+            @keyup="validPassword"
+            v-model="password"
+            id="password"
+            placeholder="digite sua senha"
+          />
+          <i class="icon bx bxs-lock"></i>
+          <i class="error icon-erro bx bx-error-circle"></i>
         </div>
-        <div class="error error-text">Senha inválido</div>
+        <div class="error error-text"></div>
       </div>
-      
+
       <div class="pass-link">
         <a href="#">Esqueci a senha 🔑</a>
       </div>
-      
-      <button @click.prevent="fnLogin" class="btn-login">logar</button>
-      
+
+      <button tabindex="3" @click.prevent="fnLogin" class="btn-login">
+        logar
+      </button>
     </form>
   </div>
 </template>
@@ -64,6 +122,8 @@ const fnLogin = () => {
 
 .form {
   width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
   padding: 0 24px;
   height: calc(100vh - 60px);
   display: flex;
@@ -85,17 +145,20 @@ const fnLogin = () => {
 }
 
 .form .field.shake {
-  animation: shake .3s ease-in-out;
+  animation: shake 0.3s ease-in-out;
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     margin-left: 0;
   }
-  20%, 80% {
+  20%,
+  80% {
     margin-left: -12px;
   }
-  40%, 60% {
+  40%,
+  60% {
     margin-left: 12px;
   }
 }
@@ -111,8 +174,22 @@ const fnLogin = () => {
   outline: none;
   border-radius: 5px;
   border: solid 1px var(--current-primary);
+  background-color: var(--dark2);
+  color: var(--white2);
   border-bottom-width: 2px;
   font-size: 17px;
+}
+
+.form .field.error input {
+  border-color: red;
+}
+
+.form .field.error input::placeholder {
+  color: red;
+}
+
+.form .field.error i {
+  color: red;
 }
 
 .form input::placeholder {
@@ -169,6 +246,7 @@ const fnLogin = () => {
 .btn-login {
   width: 100%;
   height: 50px;
+  min-height: 50px;
   background-color: var(--current-primary);
   margin-top: 30px;
   border: 1px solid var(--current-primary);
@@ -177,12 +255,18 @@ const fnLogin = () => {
   text-transform: uppercase;
   font-weight: 600;
   cursor: pointer;
-  transition: background ease .2s;
+  transition: background ease 0.2s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-login:hover {}
+.btn-login:hover {
+  transition: all ease 0.4s;
+  opacity: 0.8;
+}
 .btn-login:active {
-  scale: .94;
+  scale: 0.94;
 }
-
 </style>

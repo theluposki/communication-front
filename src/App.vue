@@ -26,6 +26,10 @@ onMounted(() => {
       favoriteColor.currentPrimary
     );
   }
+
+  if(localStorage.getItem("profile")) {
+    userStore.user = JSON.parse(decryptValue(localStorage.getItem("profile")))
+  }
 });
 </script>
 
