@@ -24,7 +24,6 @@ const changeImage = async (e) => {
   const file = e.target.files[0];
 
   selectedImageFile = file;
-  console.log(file);
 
   if (file) {
     const reader = new FileReader();
@@ -131,8 +130,6 @@ const sendImage = async () => {
     type: selectedImageFile.type,
   });
 
-  console.log(editedImageFile);
-
   await uploadFileWithProgress(editedImageFile);
 };
 
@@ -173,7 +170,6 @@ const uploadFileWithProgress = async (file) => {
       userStore.refreshUser();
       setTimeout(() => {
         currentImage.value = `${config.BASE_URL}${user.value.picture[1]}`;
-        console.log(currentImage.value);
       }, 100);
     }
     return response.data;

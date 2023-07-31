@@ -34,6 +34,11 @@ export const useUserStore = defineStore("user", () => {
   const refreshUser = async () => {
     const profile = await api.get("/profiles/my");
 
+    if (profile.status === 401) {
+      alert("Sua sessão expirou, Faça login para continuar.");
+      return 401;
+    }
+
     user.value = profile.data;
     localStorage.setItem("profile", encryptValue(JSON.stringify(profile.data)))
   }
